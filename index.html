@@ -1,0 +1,748 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargazer: Celestial Event Tracker</title>
+    <style>
+        :root {
+            --bg-deep: #050510;
+            --bg-panel: rgba(20, 20, 40, 0.7);
+            --accent-blue: #4facfe;
+            --accent-purple: #a18cd1;
+            --text-main: #e0e6ed;
+            --text-dim: #94a3b8;
+            --glow: 0 0 20px rgba(161, 140, 209, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Starry Background */
+        #star-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Layout */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .location-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Hero Section - The Next Event */
+        .hero {
+            background: var(--bg-panel);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-visual {
+            height: 150px;
+            width: 150px;
+            margin: 0 auto 2rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Visual Effects */
+        .visual-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: white;
+            box-shadow: 0 0 50px white;
+            transition: all 0.5s ease;
+        }
+
+        /* Specific Event Styles */
+        .visual-eclipse .visual-circle {
+            background: #000;
+            box-shadow: 0 0 10px #fff, inset 0 0 20px #a18cd1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .visual-moon .visual-circle {
+            background: #e0e0e0;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .visual-blood .visual-circle {
+            background: #5a1a1a;
+            box-shadow: 0 0 40px #ff4b4b;
+        }
+
+        .visual-meteor .visual-circle {
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.1), 0 0 20px white;
+            animation: shoot 2s linear infinite;
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translateX(-50px) translateY(-50px);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateX(100px) translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        .countdown {
+            font-size: 3rem;
+            font-weight: bold;
+            font-variant-numeric: tabular-nums;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            color: var(--accent-blue);
+            margin-bottom: 1rem;
+        }
+
+        .event-desc {
+            color: var(--text-dim);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Calendar Section */
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            background: var(--bg-panel);
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+
+        .weekday {
+            text-align: center;
+            font-weight: bold;
+            color: var(--accent-purple);
+            padding-bottom: 1rem;
+        }
+
+        .day {
+            background: rgba(255, 255, 255, 0.03);
+            min-height: 100px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .day:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .day-num {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .day-event {
+            font-size: 0.75rem;
+            background: rgba(79, 172, 254, 0.2);
+            border-left: 3px solid var(--accent-blue);
+            padding: 2px 4px;
+            margin-bottom: 2px;
+            border-radius: 2px;
+        }
+
+        .day-event.eclipse {
+            border-color: #ff4b4b;
+            background: rgba(255, 75, 75, 0.2);
+        }
+
+        .day-event.meteor {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .current-day {
+            border: 1px solid var(--accent-blue);
+            box-shadow: 0 0 10px rgba(79, 172, 254, 0.2);
+        }
+
+        @media (max-width: 600px) {
+            .calendar-grid {
+                grid-template-columns: repeat(1, 1fr);
+            }
+
+            .countdown {
+                font-size: 2rem;
+            }
+
+            .hero-visual {
+                height: 100px;
+                width: 100px;
+            }
+
+            .visual-circle {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="star-canvas"></canvas>
+
+    <div class="container">
+        <header>
+            <h1>Stargazer</h1>
+            <div id="location-display" class="location-badge">Detecting location...</div>
+        </header>
+
+        <section class="hero" id="hero-section">
+            <div class="hero-visual" id="hero-visual">
+                <div class="visual-circle"></div>
+            </div>
+            <h2 class="event-title" id="next-event-name">Loading Celestial Data...</h2>
+            <div class="countdown" id="countdown-timer">--:--:--:--</div>
+            <p class="event-desc" id="next-event-desc">Calibrating sensors to your location.</p>
+        </section>
+
+        <section>
+            <div class="calendar-controls">
+                <div class="nav-buttons">
+                    <button class="btn" onclick="changeMonth(-1)">&#8592; Prev</button>
+                    <span id="current-month-label" style="margin: 0 1rem; font-weight: bold;">January 2025</span>
+                    <button class="btn" onclick="changeMonth(1)">Next &#8594;</button>
+                </div>
+                <select id="event-filter" onchange="renderCalendar()">
+                    <option value="all">Show All Events</option>
+                    <option value="eclipse">Eclipses</option>
+                    <option value="meteor">Meteor Showers</option>
+                    <option value="moon">Moon Phases</option>
+                    <option value="planet">Planetary</option>
+                </select>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid">
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- 1. STAR BACKGROUND EFFECT ---
+        const canvas = document.getElementById('star-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let stars = [];
+
+        function initStars() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    size: Math.random() * 2,
+                    opacity: Math.random(),
+                    speed: Math.random() * 0.05
+                });
+            }
+        }
+
+        function animateStars() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = "white";
+            stars.forEach(star => {
+                ctx.globalAlpha = star.opacity;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+                star.opacity += (Math.random() - 0.5) * 0.05;
+                if (star.opacity < 0) star.opacity = 0;
+                if (star.opacity > 1) star.opacity = 1;
+            });
+            requestAnimationFrame(animateStars);
+        }
+
+        window.addEventListener('resize', initStars);
+        initStars();
+        animateStars();
+
+        // --- 2. ASTRONOMICAL DATA ENGINE ---
+        // This is a simplified engine. In a production app, we would use a heavy library.
+        // For this demo, we use algorithms for recurring events and lists for specific ones.
+
+        const celestialData = {
+            // Fixed Recurring Events (Approximate peaks)
+            meteorShowers: [
+                { name: "Quadrantids", month: 0, day: 3, intensity: "High" },
+                { name: "Lyrids", month: 3, day: 22, intensity: "Medium" },
+                { name: "Eta Aquariids", month: 4, day: 6, intensity: "High" },
+                { name: "Perseids", month: 7, day: 12, intensity: "Very High" },
+                { name: "Orionids", month: 9, day: 21, intensity: "Medium" },
+                { name: "Leonids", month: 10, day: 17, intensity: "Medium" },
+                { name: "Geminids", month: 11, day: 14, intensity: "Very High" },
+            ],
+            // Hardcoded major events (Eclipses are hard to calc on fly without big libs)
+            majorEvents: [
+                { date: "2025-03-14", name: "Total Lunar Eclipse", type: "eclipse", visual: "blood" },
+                { date: "2025-03-29", name: "Partial Solar Eclipse", type: "eclipse", visual: "eclipse" },
+                { date: "2025-09-07", name: "Total Lunar Eclipse", type: "eclipse", visual: "blood" },
+                { date: "2025-09-21", name: "Partial Solar Eclipse", type: "eclipse", visual: "eclipse" },
+                { date: "2026-02-17", name: "Annular Solar Eclipse", type: "eclipse", visual: "eclipse" },
+                { date: "2026-08-12", name: "Total Solar Eclipse", type: "eclipse", visual: "eclipse" }
+            ]
+        };
+
+        let userLat = 0;
+        let userLon = 0;
+
+        // --- 3. LOGIC & UI ---
+
+        let currentDate = new Date(); // Controls calendar view
+        let allEventsCache = [];
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLat = position.coords.latitude;
+                        userLon = position.coords.longitude;
+                        document.getElementById('location-display').textContent =
+                            `Lat: ${userLat.toFixed(2)}, Lon: ${userLon.toFixed(2)}`;
+                        generateEvents(); // Regenerate with location bias
+                    },
+                    (error) => {
+                        document.getElementById('location-display').textContent = "Location Access Denied (Showing Global Events)";
+                        generateEvents();
+                    }
+                );
+            } else {
+                document.getElementById('location-display').textContent = "Geolocation not supported";
+                generateEvents();
+            }
+        }
+
+        function getMoonPhase(date) {
+            // Simple Moon Phase Calculation (Conway's algorithm derivative)
+            let year = date.getFullYear();
+            let month = date.getMonth() + 1;
+            let day = date.getDate();
+            if (month < 3) { year--; month += 12; }
+            let c = 365.25 * year;
+            let e = 30.6 * month;
+            let jd = c + e + day - 694039.09; // jd is total days elapsed
+            jd /= 29.5305882; // divide by the moon cycle
+            let b = parseInt(jd); // int(jd) -> b, take integer part of jd
+            jd -= b; // subtract integer part to leave fractional part of original jd
+            b = Math.round(jd * 8); // scale fraction from 0-8 and round
+            if (b >= 8) b = 0; // 0 and 8 are the same so turn 8 into 0
+
+            const phases = ["New Moon", "Waxing Crescent", "First Quarter", "Waxing Gibbous", "Full Moon", "Waning Gibbous", "Last Quarter", "Waning Crescent"];
+            return { index: b, name: phases[b] };
+        }
+
+        function generateEvents() {
+            allEventsCache = [];
+            // We'll generate events for a wide range (2025-2030) for the purpose of the demo
+            // In a real app, generate on demand.
+
+            const startYear = 2025;
+            const endYear = 2027;
+
+            for (let y = startYear; y <= endYear; y++) {
+                // 1. Meteor Showers
+                celestialData.meteorShowers.forEach(shower => {
+                    let dateStr = `${y}-${String(shower.month + 1).padStart(2, '0')}-${String(shower.day).padStart(2, '0')}`;
+                    allEventsCache.push({
+                        date: new Date(dateStr),
+                        name: `${shower.name} Meteor Shower Peak`,
+                        type: "meteor",
+                        visual: "meteor",
+                        desc: `Intensity: ${shower.intensity}. Look towards the radiant point after midnight.`
+                    });
+                });
+
+                // 2. Moon Phases (Full Moons)
+                for (let m = 0; m < 12; m++) {
+                    for (let d = 1; d <= 28; d += 5) { // Check periodically
+                        let tempDate = new Date(y, m, d);
+                        let phase = getMoonPhase(tempDate);
+                        // We only want to log Full Moons exactly. 
+                        // This is rough approximation logic for demo speed:
+                        if (phase.index === 4) {
+                            // Find precise day
+                            // (Skipping precise binary search for brevity, labeling approximate)
+                            // To avoid duplicates, check if we already added a full moon this month
+                            const hasFullMoon = allEventsCache.some(e => e.type === 'moon' && e.date.getMonth() === m && e.date.getFullYear() === y);
+                            if (!hasFullMoon) {
+                                allEventsCache.push({
+                                    date: tempDate,
+                                    name: "Full Moon",
+                                    type: "moon",
+                                    visual: "moon",
+                                    desc: "100% Illumination."
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 3. Add Hardcoded Major Events
+            celestialData.majorEvents.forEach(e => {
+                allEventsCache.push({
+                    date: new Date(e.date + "T00:00:00"), // Fix timezone issue
+                    name: e.name,
+                    type: e.type,
+                    visual: e.visual,
+                    desc: "A major celestial alignment."
+                });
+            });
+
+            // 4. Planets (Simplified Visibility Logic)
+            // Assuming visibility based on opposition approximations would go here.
+            // Adding a dummy placeholder for planet visibility
+            let today = new Date();
+            allEventsCache.push({
+                date: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 5),
+                name: "Jupiter Visible",
+                type: "planet",
+                visual: "planet",
+                desc: "Jupiter will be bright in the eastern sky."
+            });
+
+            // Sort by date
+            allEventsCache.sort((a, b) => a.date - b.date);
+
+            updateNextEvent();
+            renderCalendar();
+        }
+
+        // --- 4. HERO SECTION LOGIC ---
+
+        function updateNextEvent() {
+            const now = new Date();
+            // Find first event in future
+            const nextEvent = allEventsCache.find(e => {
+                // Set event time to end of day to ensure we don't skip today's event
+                let eventTime = new Date(e.date);
+                eventTime.setHours(23, 59, 59);
+                return eventTime > now;
+            });
+
+            if (nextEvent) {
+                document.getElementById('next-event-name').innerText = nextEvent.name;
+                document.getElementById('next-event-desc').innerText = nextEvent.desc;
+                updateVisuals(nextEvent.visual);
+                startCountdown(nextEvent.date);
+            } else {
+                document.getElementById('next-event-name').innerText = "No Upcoming Events";
+                document.getElementById('countdown-timer').innerText = "";
+            }
+        }
+
+        function updateVisuals(visualType) {
+            const container = document.getElementById('hero-visual');
+            container.innerHTML = ''; // Clear
+
+            const circle = document.createElement('div');
+            circle.className = 'visual-circle';
+
+            if (visualType === 'blood') {
+                container.classList.add('visual-blood');
+                container.appendChild(circle);
+            } else if (visualType === 'meteor') {
+                container.classList.add('visual-meteor');
+                // Add shooting stars
+                for (let i = 0; i < 3; i++) {
+                    let s = document.createElement('div');
+                    s.className = 'shooting-star';
+                    s.style.animationDelay = `${i * 0.5}s`;
+                    s.style.top = `${Math.random() * 50}px`;
+                    container.appendChild(s);
+                }
+            } else if (visualType === 'eclipse') {
+                container.classList.add('visual-eclipse');
+                container.appendChild(circle);
+            } else {
+                container.classList.add('visual-moon');
+                container.appendChild(circle);
+            }
+        }
+
+        let timerInterval;
+        function startCountdown(targetDate) {
+            if (timerInterval) clearInterval(timerInterval);
+
+            // Set target to midnight of that day (or specific time if available)
+            const target = new Date(targetDate);
+            target.setHours(0, 0, 0, 0);
+
+            function update() {
+                const now = new Date();
+                const diff = target - now;
+
+                if (diff <= 0) {
+                    document.getElementById('countdown-timer').innerText = "HAPPENING NOW";
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('countdown-timer').innerText =
+                    `${d}d ${h}h ${m}m ${s}s`;
+            }
+
+            update();
+            timerInterval = setInterval(update, 1000);
+        }
+
+        // --- 5. CALENDAR LOGIC ---
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = ''; // Clear
+
+            // Header labels
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(d => {
+                const div = document.createElement('div');
+                div.className = 'weekday';
+                div.innerText = d;
+                grid.appendChild(div);
+            });
+
+            // Month Label
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            document.getElementById('current-month-label').innerText = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+
+            // Math for days
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Filter logic
+            const filterType = document.getElementById('event-filter').value;
+
+            // Empty slots for previous month
+            for (let i = 0; i < firstDay; i++) {
+                const empty = document.createElement('div');
+                grid.appendChild(empty);
+            }
+
+            // Days
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                cell.className = 'day';
+
+                // Highlight today
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cell.classList.add('current-day');
+                }
+
+                const num = document.createElement('div');
+                num.className = 'day-num';
+                num.innerText = day;
+                cell.appendChild(num);
+
+                // Find events for this day
+                const daysEvents = allEventsCache.filter(e =>
+                    e.date.getDate() === day &&
+                    e.date.getMonth() === month &&
+                    e.date.getFullYear() === year
+                );
+
+                daysEvents.forEach(e => {
+                    if (filterType === 'all' || e.type === filterType) {
+                        const eventBadge = document.createElement('div');
+                        eventBadge.className = `day-event ${e.type}`;
+                        eventBadge.innerText = e.name;
+                        eventBadge.title = e.desc; // Tooltip
+                        cell.appendChild(eventBadge);
+                    }
+                });
+
+                grid.appendChild(cell);
+            }
+        }
+
+        // Initialize
+        getLocation(); // This triggers generateEvents -> updateNextEvent -> renderCalendar
+    </script>
+</body>
+
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stargazer: Celestial Event Tracker</title>
+</head>
+
+<body>
+    <canvas id="star-canvas"></canvas>
+
+    <div class="container">
+        <header>
+            <h1>Stargazer</h1>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <div id="location-display" class="location-badge">Waiting for permission...</div>
+                <button id="force-location-btn" class="btn"
+                    style="padding: 0.2rem 0.6rem; font-size: 0.8rem; display: none;">Retry Location</button>
+            </div>
+        </header>
+
+        <section class="hero" id="hero-section">
+            <div class="hero-visual" id="hero-visual">
+                <div class="visual-circle"></div>
+            </div>
+            <h6 id="hero-label"
+                style="color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem; font-size: 0.8rem;">
+                Upcoming Event</h6>
+            <h2 class="event-title" id="next-event-name">Initializing...</h2>
+            <div class="countdown" id="countdown-timer">--:--:--:--</div>
+            <p class="event-desc" id="next-event-desc">Please allow location access to calculate visibility.</p>
+        </section>
+
+        <section>
+            <div class="calendar-controls">
+                <div class="nav-buttons">
+                    <button class="btn" id="prev-month">&#8592; Prev</button>
+                    <span id="current-month-label" style="margin: 0 1rem; font-weight: bold;">January 2026</span>
+                    <button class="btn" id="next-month">Next &#8594;</button>
+                </div>
+                <select id="event-filter">
+                    <option value="all">Show All Events</option>
+                    <option value="solar-eclipse">Solar Eclipses</option>
+                    <option value="lunar-eclipse">Lunar Eclipses</option>
+                    <option value="meteor">Meteor Showers</option>
+                    <option value="blood-moon">Blood Moons</option>
+                    <option value="aurora">Aurora Borealis</option>
+                    <option value="planet">Planetary Alignments</option>
+                    <option value="comet">Comets</option>
+                </select>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid">
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>

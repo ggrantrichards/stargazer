@@ -1,0 +1,436 @@
+:root {
+    --bg-deep: #050510;
+    --bg-panel: rgba(20, 20, 40, 0.7);
+    --accent-blue: #4facfe;
+    --accent-purple: #a18cd1;
+    --text-main: #e0e6ed;
+    --text-dim: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+    background-color: var(--bg-deep);
+    color: var(--text-main);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+#star-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    background: linear-gradient(to right, var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.location-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    backdrop-filter: blur(5px);
+}
+
+.hero {
+    background: var(--bg-panel);
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    margin-bottom: 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hero-visual {
+    height: 200px;
+    width: 100%;
+    margin: 0 auto 2rem;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* --- ANIMATIONS & VISUALS --- */
+
+.visual-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    transition: all 0.5s ease;
+    position: relative;
+    z-index: 2;
+}
+
+/* GLOBAL ANIMATIONS */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+/* 1. SOLAR ECLIPSE */
+.visual-solar-eclipse .visual-circle {
+    background: #000;
+    box-shadow: 0 0 10px #fff, 0 0 30px #ffaa00;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: float 6s ease-in-out infinite;
+}
+
+/* 2. LUNAR ECLIPSE */
+.visual-lunar-eclipse .visual-circle {
+    background: radial-gradient(circle at 30% 30%, #333, #000);
+    box-shadow: inset -10px -10px 20px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 255, 255, 0.2);
+    animation: float 7s ease-in-out infinite;
+}
+
+/* 3. BLOOD MOON */
+.visual-blood-moon .visual-circle {
+    background: radial-gradient(circle at 40% 40%, #8a2be2, #5a1a1a);
+    box-shadow: 0 0 50px #ff4b4b;
+    animation: float 8s ease-in-out infinite;
+}
+
+/* 4. METEOR SHOWER */
+.visual-meteor .visual-circle {
+    display: none;
+}
+
+.shooting-star {
+    position: absolute;
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, white, transparent);
+    border-radius: 50%;
+    opacity: 0;
+    transform: rotate(-45deg);
+    animation: meteor-fall 2s linear infinite;
+}
+
+@keyframes meteor-fall {
+    0% {
+        transform: translateX(0) translateY(0) rotate(-45deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(-200px) translateY(200px) rotate(-45deg);
+        opacity: 0;
+    }
+}
+
+/* 5. AURORA BOREALIS */
+.visual-aurora .visual-circle {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.aurora-curtain {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.4), rgba(0, 153, 255, 0.3), transparent 60%);
+    filter: blur(30px);
+    animation: aurora-wave 8s infinite alternate ease-in-out;
+    mix-blend-mode: screen;
+}
+
+@keyframes aurora-wave {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translate(-20px, 20px) scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* 6. PLANET */
+.visual-planet .visual-circle {
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at 30% 30%, #4facfe, #00f2fe, #000);
+    box-shadow: 0 0 30px rgba(79, 172, 254, 0.4);
+    animation: float 5s ease-in-out infinite;
+}
+
+.planet-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 160px;
+    height: 40px;
+    border-radius: 50%;
+    border: 10px solid rgba(255, 255, 255, 0.1);
+    border-top: 10px solid rgba(255, 255, 255, 0.8);
+    transform: translate(-50%, -50%) rotate(-20deg);
+    animation: ring-wobble 10s ease-in-out infinite;
+}
+
+@keyframes ring-wobble {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(-20deg) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(-10deg) scale(0.95);
+    }
+}
+
+/* 7. COMET (Realistic + Motion Illusion) */
+.visual-comet .visual-circle {
+    display: none;
+}
+
+.comet-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300px;
+    height: 100px;
+    /* Stays in middle, just hovers slightly */
+    transform: translate(-50%, -50%) rotate(-15deg);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    animation: comet-hover 4s ease-in-out infinite;
+}
+
+@keyframes comet-hover {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) rotate(-15deg) translateY(0);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) rotate(-15deg) translateY(-10px);
+    }
+}
+
+/* The Glowing Head */
+.comet-head {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #fff, 0 0 30px #4facfe, 0 0 60px #00ffff;
+    position: relative;
+    z-index: 5;
+}
+
+/* The Main Tail (Gas) */
+.comet-tail-main {
+    position: absolute;
+    right: 10px;
+    width: 250px;
+    height: 60px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.9) 0%, rgba(79, 172, 254, 0.4) 30%, transparent 100%);
+    border-radius: 100% 0 0 100%;
+    filter: blur(4px);
+    transform-origin: right center;
+    transform: scaleY(0.6);
+}
+
+/* Secondary Tail (Dust/Wisps) - Adds detail */
+.comet-tail-dust {
+    position: absolute;
+    right: 10px;
+    width: 200px;
+    height: 80px;
+    background: linear-gradient(to left, rgba(161, 140, 209, 0.5) 0%, transparent 100%);
+    border-radius: 100% 0 0 100%;
+    filter: blur(8px);
+    mix-blend-mode: screen;
+}
+
+/* Parallax stars behind comet (Move Right to Left to imply forward motion) */
+.bg-star {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 0 4px white;
+}
+
+@keyframes stars-rush-left {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(-400px);
+        opacity: 0;
+    }
+}
+
+/* UI */
+.countdown {
+    font-size: 3rem;
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 0.5rem;
+}
+
+.event-title {
+    font-size: 1.5rem;
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+}
+
+.event-desc {
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.calendar-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+select {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    background: var(--bg-panel);
+    padding: 1.5rem;
+    border-radius: 20px;
+}
+
+.weekday {
+    text-align: center;
+    font-weight: bold;
+    color: var(--accent-purple);
+    padding-bottom: 1rem;
+}
+
+.day {
+    background: rgba(255, 255, 255, 0.03);
+    min-height: 100px;
+    padding: 0.5rem;
+    border-radius: 8px;
+    position: relative;
+}
+
+.day:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.day-num {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+}
+
+.day-event {
+    font-size: 0.75rem;
+    background: rgba(79, 172, 254, 0.2);
+    border-left: 3px solid var(--accent-blue);
+    padding: 2px 4px;
+    margin-bottom: 2px;
+    border-radius: 2px;
+}
+
+.current-day {
+    border: 1px solid var(--accent-blue);
+    box-shadow: 0 0 10px rgba(79, 172, 254, 0.2);
+}
+
+@media (max-width: 600px) {
+    .calendar-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
+    .countdown {
+        font-size: 2rem;
+    }
+}
