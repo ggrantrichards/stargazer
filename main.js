@@ -1,6 +1,3 @@
-import './style.css';
-
-// --- 1. STAR BACKGROUND ---
 const canvas = document.getElementById('star-canvas');
 const ctx = canvas.getContext('2d');
 let width, height;
